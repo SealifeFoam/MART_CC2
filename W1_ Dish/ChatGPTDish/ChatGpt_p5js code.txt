@@ -1,0 +1,31 @@
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(255);
+  
+  // Draw cheese platter
+  fill(200, 160, 100); // brown color for platter
+  ellipse(width/2, height/2, 300, 200); // ellipse for the platter
+  
+  // Draw cheeses
+  drawCheese(width/2 - 100, height/2 - 50, 50); // Draw a piece of cheese
+  drawCheese(width/2 + 50, height/2 + 30, 70); // Draw another piece of cheese
+}
+
+// Function to draw a piece of cheese
+function drawCheese(x, y, size) {
+  fill(255, 240, 150); // yellow color for cheese
+  ellipse(x, y, size, size*0.7); // cheese ellipse
+  
+  // Add some texture to the cheese (optional)
+  let numHoles = 10;
+  fill(255); // white for the holes
+  for (let i = 0; i < numHoles; i++) {
+    let holeX = random(x - size/2, x + size/2);
+    let holeY = random(y - size*0.35, y + size*0.35);
+    let holeSize = random(5, 15);
+    ellipse(holeX, holeY, holeSize, holeSize);
+  }
+}
