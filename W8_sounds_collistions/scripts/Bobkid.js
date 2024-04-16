@@ -1,4 +1,4 @@
-class bobs {
+class char {
 
     constructor(){
         this.size = 50;
