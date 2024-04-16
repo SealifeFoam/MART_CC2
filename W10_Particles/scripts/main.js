@@ -3,6 +3,7 @@
 //control
 var stage = 0; //keeps track of which func to run
 
+
 //counter
 var score = 0;
 var lives= 2; 
@@ -17,11 +18,13 @@ var p1Y = 400;
 var pWidth = 45;
 var pHeight =90;
 
-//player animation
-var charObjects = [];
-var animation = [];
-var result;
-var i = 0;
+//player animation _ slime 
+var slimeObjects = [];
+var Slimeanimation = [];
+var MyWalkAnimation; 
+var attackPaths = [];
+var SlimeImage; 
+var health = 100;
 
 //platforms
 var b1X = 200;
@@ -91,6 +94,9 @@ var gameFont;
 var slime; 
 
 
+//particle -- attempt to find pixel particles later
+const particles = [];
+
 
 function setup(){
 createCanvas(1000, 500);
@@ -99,9 +105,16 @@ textAlign(CENTER);
 imageMode(CENTER);
 
 //bg music 
-//backgroundM.play();
+backgroundM.play();
 
+//animations_slime
+myAnimation = new animationImage(200, 200, 150, 150);
+myAnimation.loadAnimation('attack', attackPaths);
 
+SlimeImage = createSprite(450, 200, 100, 100, 'static');
+SlimeImage.img = "./images/ouch.png";
+SlimeImage.scale = 0.05; 
+SlimeImage.diameter = 150; 
 }
 
 function draw(){ 
@@ -111,7 +124,8 @@ gravity();
 totalTime = millis(); 
 
 
-//stage
+
+//stages
     if (stage == 0){
         splash(); 
     }
@@ -127,7 +141,35 @@ totalTime = millis();
     if (stage == 3){
         loseScreen(); 
     }
+////animation cycles _ walk, idle and attack
+if (kb.pressing('d')) {
+    myAnimation.updatePosition('forward');
+    myAnimation.drawAnimation('walk');
+    if (charImage != null) {
+        if (myAnimation.isColliding(charImage)) {
+            myAnimation.drawAnimation('idle');
+            myAnimation.updatePosition('idle');
 
+        }
+    }
+}
+else if (kb.pressing('a')) {
+    myAnimation.updatePosition('reverse');
+    myAnimation.drawAnimation('walk');
+}
+else if (kb.pressing('x')) {
+    myAnimation.drawAnimation('attack');
+    if (charImage != null) {
+        if (dist(myAnimation.getCurrentAnimation().position.x, myAnimation.getCurrentAnimation().position.y, SlimeImage.position.x, SlimeImage.position.y) < 200) {
+            createParticles(SlimeImage.position.x, SlimeImage.position.y);
+            health -= 1;
+            if(health <= 0){
+            SlimeImage.remove();
+            SlimeImage = null;}
+        }
+
+    }
+}
 }
 
 
@@ -409,7 +451,22 @@ function mousePressed(){
   stage = 1;  
 }
 
-
+//particles appear when collison attack happens_ make pixel particles green? 
+function createParticles(x,y)
+{
+for (let i = 0; i < 5; i++) {
+    let p = new Particle(x,y);
+    particles.push(p);
+  }
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].show();
+    if (particles[i].finished()) {
+      // remove this particle
+      particles.splice(i, 1);
+    }
+  }
+}
 
 function preload(){
 //image 
@@ -420,7 +477,9 @@ slime = loadImage('./media/images/ouch.png')
 landscape = loadImage('./media/images/sky.png'); 
 
 //animations 
-
+idlePaths = loadStrings("./W10_Particles/media/images/characteridle.txt");
+walkPaths = loadStrings("./W10_Particles/media/images/characterwalk.txt");
+attackPaths = loadStrings("./W10_Particles/media/images/char_attack.txt");
 	
 //sounds 
 jumpSound = loadSound('./media/audio/jump.wav');
@@ -429,6 +488,8 @@ ouchSound = loadSound('./media/audio/ouch.mp3');
 youlose = loadSound('./media/audio/Lose.wav');
 youWin = loadSound('./media/audio/SweetVictory.wav');
 backgroundM = loadSound('./media/audio/bg.wav');
+
+
 //fonts 
 gameFont = loadFont('./style/font/Pixel.ttf')// find ttf file 
  
